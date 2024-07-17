@@ -1,24 +1,30 @@
-BootStrap: library
-From: ubuntu:jammy
+Bootstrap: docker
+From: debian:latest
 
-%runscript
-    echo "singularity container for diann 1.8.1"
+%labels
+    Version v0.0.1
 
-%post
+%help
+    This is a container to run dia-nn. Originally from https://github.com/lzy604/Protpipe
+
+%%post
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y wget libgomp1
-    
+    apt install -y wget unzip
+    apt install -y libgomp1
+    apt install -y locales-all
     cd /opt
-    mkdir diann
-    cd diann
+    mkdir diann_exe
+    cd diann_exe
+    wget https://github.com/vdemichev/DiaNN/releases/download/1.9.1/diann-1.9.1.Linux.zip
+    unzip diann-1.9.1.Linux.zip
+    rm diann-1.9.1.Linux.zip
+    cd diann-1.9.1
+    chmod +x diann-linux
+    cd /opt
+    ln -s diann_exe/diann-1.9.1/diann-linux diann
 
-    wget https://github.com/vdemichev/DiaNN/releases/download/1.8.1/diann_1.8.1.tar.gz
-    tar -zxf diann_1.8.1.tar.gz && rm diann_1.8.1.tar.gz
-    chmod +x diann-1.8.1
-    ln -s diann-1.8.1 diann
-    
     unset DEBIAN_FRONTEND
-    
+
 %environment
     export PATH=/opt/diann:$PATH
